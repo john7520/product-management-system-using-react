@@ -2,7 +2,7 @@ import React from 'react'
 
 function AddCategory() {
   return (
-    <section class="add-category ">
+    <section className="add-category ">
         <h1>Add New Category</h1>
         <form action="http://localhost:4000/add-category" method="post">
             <label for="">Name:</label>

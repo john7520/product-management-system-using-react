@@ -4,7 +4,7 @@ function AddProduct() {
   return (
     <section className="add-product">
         <h1>Add new Product</h1>
-        <form action="http://localhost:4000/add-product" method="post">
+        <form action="http://localhost:5000/add-product" method="post">
             <label for="">Product Name:</label>
             <input type="text" name="name" required/>
             <label for="">Price:</label>
@@ -13,7 +13,8 @@ function AddProduct() {
             <input type="number" name="quantity" required/>
             <label for="">Category:</label>
             <select name="category" id="">
-                <option value="">Null</option>
+              <option value="">Null</option>
+              <option value="">Electronics</option>
             </select>
             <button type="submit">Add New Product</button>
         </form>
