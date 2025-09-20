@@ -22,7 +22,7 @@ MyConnection.connect((err) => {
 const server = express();
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
-
+server.use(cors())
 server.post("/add-product", (req, res) => {
   console.log(req.body)
   const { name, price, quantity, category } = req.body;
