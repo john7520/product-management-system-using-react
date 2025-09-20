@@ -1,14 +1,17 @@
 const express = require("express");
 const mysql2 = require("mysql2");
 const cors = require("cors");
-let PORT = 5000;
+const dotenv = require('dotenv');
+dotenv.config()
+let PORT = process.env.PORT;
+console.log(process.env.PORT)
 
 //create database connection
 const MyConnection = mysql2.createConnection({
-  database: "react product managment",
-  user: "product-admin",
-  password: "Z_d97DkM8nPMXmG!",
-  host: "localhost",
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  host: process.env.DB_HOST,
 });
 //test if the database is connected
 MyConnection.connect((err) => {
