@@ -29,7 +29,7 @@ function CategoryList() {
                 {
                   category.map((element) => {
                     return (
-                      <tr>
+                      <tr key={element.category_id}>
                         <td>{element.category_id}</td>
                         <td>{element.category} </td>
                       </tr>

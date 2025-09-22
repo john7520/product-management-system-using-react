@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
-
+import sweetAlert from "sweetalert2"
 function DeleteCategory() {
   const [ id, setId ] = useState("")
   
-  async function HandleDelete() {
+  async function HandleDelete(e) {
+    e.preventDefault()
     try {
       let result = await fetch("http://localhost:5000/delete-category", {
         method: "delete",
@@ -14,7 +15,13 @@ function DeleteCategory() {
           id:id
         })
       })
-      await result.json()
+      let data = await result.json()
+      if (data.success) {
+        sweetAlert.fire(" ✅ Success", data.msg, "success")
+      } else {
+        sweetAlert.fire(" ⚠️ Notice", data.msg, "warning")
+        
+      }
     } catch (error) {
       console.log(error)
     }

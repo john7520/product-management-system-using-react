@@ -2,6 +2,7 @@ const express = require("express");
 const mysql2 = require("mysql2");
 const cors = require("cors");
 const dotenv = require('dotenv');
+const e = require("express");
 dotenv.config()
 let PORT = process.env.PORT;
 console.log(process.env.PORT)
@@ -11,7 +12,7 @@ const MyConnection = mysql2.createConnection({
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  host: process.env.DB_HOST,
+  host: process.env.HOST,
 });
 //test if the database is connected
 MyConnection.connect((err) => {
@@ -39,7 +40,8 @@ server.post("/add-product", (req, res) => {
       MyConnection.query("select * from categories", (err, results, fields) => {
         if (err) {
           console.log(err.message)
-          res.send(err.message)
+          res.json({ success: false, msg: err.message })
+          
         } else {
           
           for (let i of results) {
@@ -55,9 +57,9 @@ server.post("/add-product", (req, res) => {
             MyConnection.query(InsertProduct, [name, price, quantity, id], (err, results, fields) => {
               if (err) {
                 console.log(err.message)
-                res.send(err.message)
+                res.json({ success: false, msg: err.message })
               } else {
-                res.send("data inserted successfully")
+                res.json({ success: true, msg: "product inserted successfully." })
               }
             })
             
@@ -65,15 +67,15 @@ server.post("/add-product", (req, res) => {
             MyConnection.query(InsertCategory, [category], (err, results, fields) => {
               if (err) {
                 console.log(err.message)
-                res.send(err.message)
+                res.json({ success: false, msg: err.message })
               } else {
                 id = results.insertId
                 MyConnection.query(InsertProduct, [name, price, quantity, id], (err, results, fields) => {
                   if (err) {
                     console.log(err.message)
-                    res.send(err.message)
+                    res.json({ success: false, msg: err.message })
                   } else {
-                    res.send("data inserted successfully")
+                    res.json({ success: true, msg: "product inserted successfully." })
                   }
                 })
               }
@@ -87,9 +89,9 @@ server.post("/add-product", (req, res) => {
       MyConnection.query(insertProductWithNullCategory, [name, price, quantity], (err, results, fields) => {
         if (err) {
           console.log(err.message)
-          res.send(err.message)
+          res.json({ success: false, msg: err.message })
         } else {
-          res.send("data inserted successfully")
+          res.json({ success: true, msg: "product inserted successfully." })
         }
       })
     }
@@ -129,43 +131,84 @@ server.get("/list-product", (req, res) => {
 
 server.delete("/delete-product", (req, res) => {
   const { id } = req.body
-  let deleteQuery = `delete from products where product_id=?`
-  MyConnection.query(deleteQuery, [id], (err, results, fields) => {
+
+  MyConnection.query("select * from products", (err, results, fields) => {
     if (err) {
-      console.log(err.message)
-      res.send(err.message)
+      res.json({ success: false, msg: err.message })
     } else {
-      res.send("product have deleted successfully")
+      let check = false
+      for (let i of results) {
+        if (i.product_id == id) {
+          check = true
+          
+        }
+      }
+      if (check) {
+        let deleteQuery = `delete from products where product_id=?`
+        MyConnection.query(deleteQuery, [id], (err, results, fields) => {
+          if (err) {
+            console.log(err.message)
+            res.json({ success: false, msg: err.message })
+          } else {
+            res.json({ success: true, msg: "Product has deleted Successfully." })
+          }
+        })
+      } else {
+        res.json({ success: false, msg: `${id} invalid product Id.` })
+      }
     }
   })
+  
 })
 
 server.put("/update-product", (req, res) => {
   const { id, name, price, quantity, category } = req.body
-  let category_id;
-  let updateQuery = `update products set name=?, price=?,quantity=?,category_id=? WHERE product_id=?`
-  
-  MyConnection.query("select * from categories", (err, results, fields) => {
+  MyConnection.query("select * from products", (err, results, fields) => {
     if (err) {
-      console.log(err.message)
-      res.send(err.message)
+      res.json({ success: false, msg: err.message })
+      
     } else {
+      let check = false
       for (let i of results) {
-        if (i.category === category) {
-          category_id = i.category_id
-          break;
+        if (i.product_id == id) {
+          check = true
+          
         }
       }
-      MyConnection.query(updateQuery, [name, price, quantity, category_id, id], (err, results, fields) => {
-        if (err) {
-          console.log(err.message)
-          res.send(err.message)
-        } else {
-          res.send("product has updated successfully")
-        }
-      })
+      if (check) {
+        let category_id;
+        let updateQuery = `update products set name=?, price=?,quantity=?,category_id=? WHERE product_id=?`
+        
+        MyConnection.query("select * from categories", (err, results, fields) => {
+          if (err) {
+            console.log(err.message)
+            res.json({ success: false, msg: err.message })
+            
+          } else {
+            for (let i of results) {
+              if (i.category === category) {
+                category_id = i.category_id
+                break;
+              }
+            }
+            MyConnection.query(updateQuery, [name, price, quantity, category_id, id], (err, results, fields) => {
+              if (err) {
+                console.log(err.message)
+                res.json({ success: false, msg: err.message })
+              } else {
+                res.json({ success: true, msg: "product has updated successfully" })
+                
+              }
+            })
+          }
+        })
+      } else {
+        res.json({ success: false, msg: `${id} has invalid product id.` })
+        
+      }
     }
   })
+  
   
 })
 server.post("/add-category", (req, res) => {
@@ -180,16 +223,16 @@ server.post("/add-category", (req, res) => {
         for (let i of results) {
           if (i.category === category) {
             check = 1;
-            res.send(`${i.category} already exists.`)
+            return res.json({ success: false, message: `${category} already exists.` });
           } 
         }
         if (check === 0) {
           MyConnection.query("insert into categories (category) values (?)",[category], (err, results, fields) => {
             if (err) {
               console.log(err.message)
-              res.send(err.message)
+              res.status(500).json({ success: false, message: err.message });
             } else {
-              res.send("data inserted successfully")
+              res.json({ success: true, message: "Category inserted successfully" });
             }
           })
         }
@@ -217,16 +260,35 @@ server.get("/list-category", (req, res) => {
 
 server.delete("/delete-category", (req, res) => {
   const { id } = req.body
-  
-  let deleteQuery = `delete from categories where category_id=?`
-  MyConnection.query(deleteQuery, [id], (err, results, fields) => {
+  let check = false;
+  MyConnection.query("select * from categories", (err, results, fields) => {
     if (err) {
-      console.log(err.message)
-      res.send(err.message)
+      res.json({ success: false, msg: err.message })
     } else {
-      res.send("category has deleted successfully")
+      for (let i of results) {
+        if (i.category_id == id) {
+          check = true
+        }
+      }
+      if (check) {
+        let deleteQuery = `delete from categories where category_id=?`
+        MyConnection.query(deleteQuery, [id], (err, results, fields) => {
+          if (err) {
+            console.log(err.message)
+            res.json({ "success": false, "msg": err.message })
+          } else {
+            res.json({ "success": true, "msg": "category has deleted successfully." })
+          }
+        })
+        
+        
+      } else {
+        return res.json({ success: false, msg: `${id} has invalid category id.` })
+      }
     }
   })
+
+  
   
 })
 PORT = PORT || 3000;

@@ -34,7 +34,7 @@ function ListProduct() {
             <tbody>
                 {
             sortedProducts.map((element) => {
-                  console.log(element)
+                  
                   return (
                     <tr key={element.product_id}>
                       <td>{element.product_id} </td>

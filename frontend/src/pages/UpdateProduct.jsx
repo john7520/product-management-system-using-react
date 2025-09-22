@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import Swal from 'sweetalert2'
 
 function UpdateProduct() {
   const [id, setId] = useState("")
@@ -19,7 +20,8 @@ function UpdateProduct() {
     }
     FetchData()
   }, [])
-  async function HandleUpdate() {
+  async function HandleUpdate(e) {
+    e.preventDefault()
     try {
       let result = await fetch("http://localhost:5000/update-product", {
         method: "put",
@@ -35,7 +37,14 @@ function UpdateProduct() {
           
         })
       })
-      await result.json()
+      let data = await result.json()
+      if (data.success) {
+        Swal.fire("✅ Success", data.msg, "success")
+        
+      } else {
+        Swal.fire("⚠️ Notice", data.msg, "warning")
+        
+      }
     } catch (error) {
       console.log(error)
     }

@@ -166,12 +166,12 @@ th, td {
         display: none;
     }
     tbody tr {
-        margin-bottom: 10px;
+        margin-bottom: 30px;
         border: 1px solid #ddd;
         padding: 10px;
     }
     tbody td {
-        text-align: right;
+        text-align: center;
         padding: 8px;
         position: relative;
     }
