@@ -3,9 +3,18 @@ const mysql2 = require("mysql2");
 const cors = require("cors");
 const dotenv = require('dotenv');
 const e = require("express");
+import path from "path";
 dotenv.config()
 let PORT = process.env.PORT;
 console.log(process.env.PORT)
+
+// Serve React frontend
+app.use(express.static(path.join(__dirname, "../frontend/dist"))); // Vite
+
+// Catch-all route to index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
+});
 
 //create database connection
 const MyConnection = mysql2.createConnection({
