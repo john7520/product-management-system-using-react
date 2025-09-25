@@ -2,19 +2,12 @@ const express = require("express");
 const mysql2 = require("mysql2");
 const cors = require("cors");
 const dotenv = require('dotenv');
-const e = require("express");
 import path from "path";
 dotenv.config()
 let PORT = process.env.PORT;
 console.log(process.env.PORT)
 
-// Serve React frontend
-app.use(express.static(path.join(__dirname, "../frontend/dist"))); // Vite
 
-// Catch-all route to index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
-});
 
 //create database connection
 const MyConnection = mysql2.createConnection({
@@ -24,18 +17,25 @@ const MyConnection = mysql2.createConnection({
   host: process.env.HOST,
 });
 //test if the database is connected
-MyConnection.connect((err) => {
-  if (err) {
-    console.log(err.message);
-  } else {
-    console.log("connected to database");
-  }
+MyConnection.connect(err => {
+  if (err) console.log("Database connection failed:", err.message);
+  else console.log("Connected to database!");
 });
 
 const server = express();
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cors())
+
+// Serve React frontend
+app.use(express.static(path.join(__dirname, "../frontend/dist"))); // Vite
+
+// Catch-all route to index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
+});
+
+
 server.post("/add-product", (req, res) => {
   console.log(req.body)
   const { name, price, quantity, category } = req.body;
