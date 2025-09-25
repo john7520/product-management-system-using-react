@@ -1,11 +1,11 @@
-const express = require("express");
+const express = require('express');
 const mysql2 = require("mysql2");
 const cors = require("cors");
 const dotenv = require('dotenv');
-import path from "path";
+const path = require('path');
 dotenv.config()
 let PORT = process.env.PORT;
-console.log(process.env.PORT)
+
 
 
 
@@ -26,14 +26,6 @@ const server = express();
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cors())
-
-// Serve React frontend
-app.use(express.static(path.join(__dirname, "../frontend/dist"))); // Vite
-
-// Catch-all route to index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
-});
 
 
 server.post("/add-product", (req, res) => {
@@ -300,7 +292,14 @@ server.delete("/delete-category", (req, res) => {
   
   
 })
-PORT = PORT || 3000;
+// Serve React frontend (after all API routes!)
+server.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+// Catch-all route
+server.get(/.*/, (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
+});
+PORT = PORT || 5000;
 server.listen(PORT, (err) => {
   if (err) {
     console.log(err.message);
