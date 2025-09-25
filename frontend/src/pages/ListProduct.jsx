@@ -39,7 +39,7 @@ function ListProduct() {
                     <tr key={element.product_id}>
                       <td>{element.product_id} </td>
                       <td>{element.name} </td>
-                      <td>{element.price} </td>
+                      <td>${element.price} </td>
                       <td>{element.quantity} </td>
                       <td>{element.category?element.category:"Null"} </td>
                     </tr>
